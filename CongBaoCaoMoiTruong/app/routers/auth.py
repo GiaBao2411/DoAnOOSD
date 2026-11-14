@@ -1,5 +1,3 @@
-"""API đăng nhập (FormDangNhap), đổi mật khẩu, trang chính theo vai trò (FormMain) và đường dẫn
-/api/trang-thai-moi cho cơ chế tự cập nhật của trang nội bộ."""
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy import func, select
@@ -17,7 +15,6 @@ router = APIRouter(prefix="/api")
 
 @router.get("/toi")
 def toi(tk=Depends(nguoi_dung)):
-    """Tài khoản đang đăng nhập (null nếu chưa đăng nhập)."""
     return dict(tai_khoan=tai_khoan_json(tk))
 
 
@@ -78,8 +75,6 @@ def trang_chinh(db: Session = Depends(get_db), tk=Depends(noi_bo)):
 
 @router.get("/trang-thai-moi")
 def trang_thai_moi(db: Session = Depends(get_db), tk=Depends(noi_bo)):
-    """Trang nội bộ hỏi mỗi vài giây: số việc đang chờ (hiện trên menu) và một "dấu" thay đổi.
-    Đơn vị gửi kết quả -> dấu đổi -> trang cán bộ tự tải lại dữ liệu / báo có kết quả mới cần duyệt."""
     P = M.PhanCongXuLy
     if tk.LoaiTaiKhoan == TT.TK_DON_VI:
         cho_nhan = db.scalar(select(func.count()).select_from(P)

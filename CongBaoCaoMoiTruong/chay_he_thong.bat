@@ -4,7 +4,6 @@ cd /d "%~dp0"
 title Cong bao cao su co moi truong - dang chay (dong cua so nay de tat web)
 set PYTHONIOENCODING=utf-8
 
-rem ---------- 1. Moi truong Python (.venv) va thu vien: lan dau tu cai ----------
 if not exist ".venv\Scripts\python.exe" (
   python -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" >nul 2>nul
   if errorlevel 1 (
@@ -19,11 +18,9 @@ if not exist ".venv\Scripts\python.exe" (
 if errorlevel 1 ( echo [LOI] Cai thu vien that bai. Kiem tra Internet roi chay lai. & pause & exit /b 1 )
 if not exist ".env" copy ".env.example" ".env" >nul
 
-rem ---------- 2. Co so du lieu: tu tao database, 18 bang, du lieu mau neu chua co (dang nhap bang tai khoan Windows) ----------
 ".venv\Scripts\python.exe" -m app.seed
 if errorlevel 1 ( pause & exit /b 1 )
 
-rem ---------- 3. Jaeger (OpenTelemetry) bang Docker: chi bat khi Docker Desktop dang chay ----------
 set OTEL_EXPORTER_OTLP_ENDPOINT=
 docker info >nul 2>nul
 if errorlevel 1 (
@@ -32,7 +29,6 @@ if errorlevel 1 (
   docker compose up -d >nul 2>nul && set OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
 )
 
-rem ---------- 4. Chay web (FastAPI + giao dien React da build) ----------
 echo ============================================================
 echo  Web:     http://localhost:8000
 if defined OTEL_EXPORTER_OTLP_ENDPOINT echo  Jaeger:  http://localhost:16686   ^(xem trace OpenTelemetry^)

@@ -1,11 +1,8 @@
-
-# Môi trường và thư viện tải về
 .venv/
 frontend/node_modules/
 __pycache__/
 *.pyc
 
-# Dữ liệu chạy thử
 uploads/bang_chung/
 uploads/tam/
 *.db

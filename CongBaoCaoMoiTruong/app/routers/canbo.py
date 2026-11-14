@@ -1,5 +1,3 @@
-"""API cho các màn hình của cán bộ xử lý: FormTiepNhan, FormPhanCong, FormDuyetKetQua, FormKiemDuyet,
-FormThietBiDo, FormTraCuu (nội bộ)."""
 from datetime import timedelta
 from typing import List
 
@@ -27,7 +25,6 @@ def _bc(db, ma):
 
 @router.get("/bao-cao/{ma}")
 def chi_tiet_bao_cao(ma: int, db: Session = Depends(get_db), tk=Depends(can_bo)):
-    """Chi tiết đầy đủ một báo cáo cho cán bộ (dùng ở Tiếp nhận, Phân công, Tra cứu nội bộ)."""
     bc = _bc(db, ma)
     d = bc_chi_tiet(bc, lien_he=True)
     yc = [y for y in bc.yeu_cau_bo_sung if y.TrangThai == TT.YC_CHO]
@@ -38,7 +35,6 @@ def chi_tiet_bao_cao(ma: int, db: Session = Depends(get_db), tk=Depends(can_bo))
     return d
 
 
-# ---------------- UC05 Tiếp nhận và kiểm tra ----------------
 @router.get("/tiep-nhan")
 def tiep_nhan(tab: str = "moi", trang: int = 1, db: Session = Depends(get_db), tk=Depends(can_bo)):
     ds = tiep_nhan_service.hang_doi(db, tab, trang)
@@ -78,7 +74,6 @@ def tn_dong(ma: int, db: Session = Depends(get_db), tk=Depends(can_bo)):
     return dict(thong_bao="Đã đóng hồ sơ do quá hạn bổ sung.")
 
 
-# ---------------- UC06 Phân công ----------------
 @router.get("/phan-cong")
 def phan_cong(ma: int = 0, trang: int = 1, db: Session = Depends(get_db), tk=Depends(can_bo)):
     out = dict(ds=trang_json(phan_cong_service.danh_sach_cho(db, trang), bc_tom_tat), chon=None)
@@ -102,7 +97,6 @@ def pc_giao(ma: int, ma_don_vi: str = Form(""), noi_dung: str = Form(""), rv: st
     return dict(thong_bao="Đã giao PC-%d cho %s." % (pc.MaPhanCong, pc.don_vi.TenDonVi))
 
 
-# ---------------- UC07 Duyệt kết quả ----------------
 @router.get("/nghiem-thu")
 def nghiem_thu(pc: int = 0, trang: int = 1, db: Session = Depends(get_db), tk=Depends(can_bo)):
     ds = nghiem_thu_service.cho_nghiem_thu(db, trang)
@@ -120,13 +114,11 @@ def nt_luu(pc: int, ket_qua: str = Form(""), nhan_xet: str = Form(""), db: Sessi
            tk=Depends(can_bo)):
     p = nghiem_thu_service.nghiem_thu(db, pc, ket_qua, nhan_xet, tk)
     if ket_qua == TT.NT_DAT:
-        # Đạt -> báo cáo sang "Chờ công khai": giao diện mở luôn trang kiểm duyệt của báo cáo đó
         return dict(thong_bao="Đã duyệt PC-%d: Đạt. Báo cáo chuyển sang Chờ công khai — kiểm duyệt nội dung rồi công khai bên dưới." % pc,
                     chuyen_den="/can-bo/kiem-duyet?ma=%d" % p.MaBaoCao)
     return dict(thong_bao="Đã lưu kết quả duyệt PC-%d: %s." % (pc, ket_qua), chuyen_den="/can-bo/nghiem-thu")
 
 
-# ---------------- UC08 Kiểm duyệt và công khai ----------------
 @router.get("/kiem-duyet")
 def kiem_duyet(ma: int = 0, trang: int = 1, db: Session = Depends(get_db), tk=Depends(can_bo)):
     ds = kiem_duyet_service.cho_cong_khai(db, trang)
@@ -165,7 +157,6 @@ def kd_luu(ma: int, hanh_dong: str = Form(""), tieu_de: str = Form(""), noi_dung
     return dict(thong_bao="Đã ghi quyết định không duyệt.", chuyen_den="/can-bo/kiem-duyet?ma=%d" % ma)
 
 
-# ---------------- UC14 Theo dõi số liệu của thiết bị đo (module M8) ----------------
 @router.get("/tram-quan-trac")
 def tram_quan_trac(tram: int = 0, tu: str = "", den: str = "", vuot: str = "", db: Session = Depends(get_db),
                    tk=Depends(can_bo)):
@@ -188,7 +179,6 @@ def tram_quan_trac(tram: int = 0, tu: str = "", den: str = "", vuot: str = "", d
                 tu=dt(t_tu), den=dt(t_den), phut=tham_so(db, "TRAM_MAT_KET_NOI_PHUT"))
 
 
-# ---------------- UC02 Tra cứu nội bộ ----------------
 @router.get("/tra-cuu")
 def tra_cuu(q: str = "", trang_thai: str = "", loai: str = "", dia_ban: str = "", tu_ngay: str = "",
             den_ngay: str = "", trang: int = 1, db: Session = Depends(get_db), tk=Depends(can_bo)):

@@ -1,4 +1,3 @@
-// Phần quản lý của cán bộ: FormDanhMuc (UC09), FormTaiKhoan (UC10)
 import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { guiForm } from "../api.js";
 import { dt, so0 } from "../dinh_dang.js";
@@ -7,7 +6,6 @@ import { useTai, useUngDung } from "../ung_dung.jsx";
 
 const TAB = [["loai", "Loại sự cố"], ["dia-ban", "Địa bàn"], ["don-vi", "Đơn vị xử lý"], ["tram", "Thiết bị đo"], ["tham-so", "Tham số hệ thống"]];
 
-// Lưu rồi mở lại trang; thông tin chỉ hiện một lần (khóa thiết bị, mật khẩu tạm) truyền qua state của lần chuyển trang
 function useLuu() {
   const { xong, baoTaiCho } = useUngDung();
   return async (url, duLieu, urlXong, kem) => {

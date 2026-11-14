@@ -1,5 +1,3 @@
-// Bản đồ (module M2) dùng Leaflet + nền OpenStreetMap. Không có Internet thì nền bản đồ không hiện
-// nhưng hệ thống vẫn chạy.
 import { useEffect, useImperativeHandle, useRef, forwardRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -7,7 +5,6 @@ import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
-// Vite tự đưa đường dẫn đúng của ảnh ghim; bỏ hàm tự ghép đường dẫn của Leaflet để ghim không bị vỡ hình
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
 
@@ -15,7 +12,6 @@ function nen(map) {
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19, attribution: "© OpenStreetMap" }).addTo(map);
 }
 
-// Bản đồ xem nhiều điểm; mỗi điểm có thể có popup (html)
 export function BanDoXem({ diem, zoom = 12, className = "map", id }) {
   const ref = useRef(null);
   const khoa = JSON.stringify(diem);
@@ -35,7 +31,6 @@ export function BanDoXem({ diem, zoom = 12, className = "map", id }) {
   return <div ref={ref} id={id} className={className}></div>;
 }
 
-// Bản đồ một điểm (vị trí sự cố)
 export function BanDoDiem({ lat, lng, className = "map sm" }) {
   if (lat === null || lat === undefined || lng === null || lng === undefined) return null;
   return <BanDoXem diem={[{ lat, lng }]} zoom={15} className={className} />;
@@ -45,7 +40,6 @@ export function escHtml(s) {
   return String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
-// Bản đồ chọn điểm: bấm để đặt ghim (kéo được), ghi vĩ độ/kinh độ qua onChon(lat, lng, tuBanDo)
 export const BanDoChon = forwardRef(function BanDoChon({ lat0, lng0, onChon, className = "map sm" }, ref) {
   const el = useRef(null);
   const st = useRef({ map: null, mk: null });
@@ -64,7 +58,6 @@ export const BanDoChon = forwardRef(function BanDoChon({ lat0, lng0, onChon, cla
       map.remove();
       st.current = { map: null, mk: null };
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function dat(lat, lng) {
@@ -91,7 +84,6 @@ export const BanDoChon = forwardRef(function BanDoChon({ lat0, lng0, onChon, cla
   return <div ref={el} className={className}></div>;
 });
 
-// Lấy vị trí thiết bị (GPS của trình duyệt)
 export function layViTri(xong, loi) {
   if (!navigator.geolocation) {
     loi("Trình duyệt không hỗ trợ định vị.");
@@ -103,7 +95,6 @@ export function layViTri(xong, loi) {
   );
 }
 
-// Tìm tọa độ từ địa chỉ và tìm địa chỉ từ tọa độ bằng Nominatim của OpenStreetMap (cần Internet)
 export async function timToaDo(q, tam) {
   const url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=vn&accept-language=vi" +
     "&viewbox=" + [tam.lng - 0.4, tam.lat + 0.4, tam.lng + 0.4, tam.lat - 0.4].join(",") + "&q=" + encodeURIComponent(q);
@@ -120,7 +111,6 @@ export async function timDiaChi(lat, lng) {
   return kq && !kq.error ? kq : null;
 }
 
-// Địa chỉ đầy đủ (có phường, thành phố), bỏ mã bưu chính và "Việt Nam"; ghép số nhà với tên đường.
 export function rutGon(kq) {
   const ds = (kq.display_name || "").split(",").map((s) => s.trim()).filter((s) => s && s !== "Việt Nam" && !/^\d{5,6}$/.test(s));
   for (let i = 0; i < ds.length - 1; i++) {

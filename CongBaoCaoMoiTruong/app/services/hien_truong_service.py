@@ -1,4 +1,3 @@
-"""HienTruongService — UC11 Xử lý hiện trường (module M5, M2, M3). BR09, BR10."""
 import math
 
 from sqlalchemy import select
@@ -20,7 +19,6 @@ def nhiem_vu_cua_don_vi(db: Session, tk: M.TaiKhoan, chi_dang_lam=True, trang=1)
 
 
 def nhiem_vu_dang_xu_ly(db: Session, tk: M.TaiKhoan):
-    """Các nhiệm vụ của đơn vị đang ở trạng thái Đang xử lý — những nhiệm vụ cập nhật tiến độ / gửi kết quả được."""
     P = M.PhanCongXuLy
     return db.scalars(select(P).where(P.MaDonVi == tk.MaDonVi, P.TrangThai == TT.PC_DANG_XU_LY)
                       .order_by(P.NgayPhanCong, P.MaPhanCong)).all()
@@ -28,7 +26,7 @@ def nhiem_vu_dang_xu_ly(db: Session, tk: M.TaiKhoan):
 
 def lay_nhiem_vu(db: Session, ma_pc, tk: M.TaiKhoan) -> M.PhanCongXuLy:
     pc = db.get(M.PhanCongXuLy, int(ma_pc))
-    yeu_cau(pc and pc.MaDonVi == tk.MaDonVi, "Nhiệm vụ không thuộc đơn vị của bạn.")  # BR09
+    yeu_cau(pc and pc.MaDonVi == tk.MaDonVi, "Nhiệm vụ không thuộc đơn vị của bạn.")
     return pc
 
 
@@ -68,7 +66,6 @@ def khoang_cach_m(lat1, lng1, lat2, lng2):
 
 
 def luu_cap_nhat(db: Session, pc, tk, loai, noi_dung, tep_tai_len, giai_doan, phan_tram=None, vi_do=None, kinh_do=None):
-    """Lưu một lần cập nhật kèm ảnh/video (dùng chung cho UC11, UC12)."""
     teps = LT.tai_len_tam(db, tep_tai_len)
     da_chuyen = []
     try:

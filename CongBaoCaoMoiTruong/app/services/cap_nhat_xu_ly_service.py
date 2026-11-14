@@ -1,4 +1,3 @@
-"""CapNhatXuLyService — UC12 Cập nhật tiến độ và kết quả (module M5, M3). BR10, BR11."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -31,7 +30,7 @@ def gui_ket_qua(db: Session, ma_pc, ket_qua, tep_tai_len, tk):
             "Gửi kết quả phải kèm ít nhất một ảnh sau xử lý (BR10).")
     _, teps, da = luu_cap_nhat(db, pc, tk, TT.CN_KET_QUA, ket_qua, tep_tai_len, TT.GD_SAU, phan_tram=100)
     try:
-        pc.TrangThai = TT.PC_CHO_NGHIEM_THU   # BR11: chờ cán bộ duyệt kết quả
+        pc.TrangThai = TT.PC_CHO_NGHIEM_THU
         chuyen_trang_thai(db, pc.bao_cao, TT.BC_CHO_NGHIEM_THU, tk.MaTaiKhoan, "Đơn vị gửi kết quả xử lý")
         db.commit()
     except Exception:

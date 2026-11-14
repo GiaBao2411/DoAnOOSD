@@ -1,4 +1,3 @@
-"""NghiemThuService — UC07 Nghiệm thu kết quả (module M4). BR12."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 

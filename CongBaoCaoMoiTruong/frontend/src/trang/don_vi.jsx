@@ -1,4 +1,3 @@
-// Trang của đơn vị xử lý hiện trường: FormNhiemVuHienTruong (UC11), FormCapNhatXuLy (UC12)
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { duLieuForm } from "../api.js";
@@ -105,7 +104,6 @@ export function NhiemVu() {
   );
 }
 
-// Mở nhiệm vụ không thuộc đơn vị (BR09): báo lỗi rồi về danh sách nhiệm vụ
 function BaoLoiChuyen({ loi }) {
   return (
     <>
@@ -126,7 +124,6 @@ export function CapNhat() {
 
   if (!pcMa) {
     if (!ds.d) return null;
-    // Mở từ menu: chỉ có 1 nhiệm vụ đang xử lý thì mở luôn, nhiều thì cho chọn
     if (ds.d.ds.length === 1) return <Navigate to={"/don-vi/cap-nhat?pc=" + ds.d.ds[0].ma} replace />;
     return (
       <>

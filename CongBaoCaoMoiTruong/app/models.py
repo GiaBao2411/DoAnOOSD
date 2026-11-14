@@ -1,4 +1,3 @@
-"""18 lớp thực thể / 18 bảng — khớp mục 2.3, 3.2 và 4.3 của báo cáo."""
 from sqlalchemy import (BigInteger, Boolean, CheckConstraint, Column, DateTime, ForeignKey, Index, Integer,
                         LargeBinary, Numeric, SmallInteger, String, Unicode, UnicodeText, FetchedValue, text)
 from sqlalchemy.dialects import mssql
@@ -7,7 +6,6 @@ from sqlalchemy.orm import relationship
 from .db import Base
 from . import trang_thai as TT
 
-# ---- kiểu dữ liệu theo SQL Server (có biến thể để chạy thử bằng SQLite)
 DT = DateTime().with_variant(mssql.DATETIME2(), "mssql")
 DEC96 = Numeric(9, 6, asdecimal=False)
 DEC81 = Numeric(8, 1, asdecimal=False)
@@ -21,7 +19,6 @@ def NV(n=None):
 
 
 def check_in(col, values, name):
-    """CHECK (col IN (...)) — SQL Server cần tiền tố N'' cho chuỗi Unicode."""
     ms = CheckConstraint("%s IN (%s)" % (col, ", ".join("N'%s'" % v for v in values)), name=name).ddl_if(dialect="mssql")
     lite = CheckConstraint("%s IN (%s)" % (col, ", ".join("'%s'" % v for v in values)), name=name).ddl_if(dialect="sqlite")
     return [ms, lite]
@@ -95,9 +92,7 @@ class TaiKhoan(Base):
     __table_args__ = (
         *check_in("LoaiTaiKhoan", [TT.TK_CAN_BO, TT.TK_DON_VI], "CK_TaiKhoan_Loai"),
         *check_in("TrangThai", [TT.TK_HOAT_DONG, TT.TK_BI_KHOA], "CK_TaiKhoan_TrangThai"),
-        # đúng một trong hai chủ sở hữu: cán bộ hoặc đơn vị xử lý
         check("(MaCanBo IS NOT NULL AND MaDonVi IS NULL) OR (MaCanBo IS NULL AND MaDonVi IS NOT NULL)", "CK_TaiKhoan_ChuSoHuu"),
-        # mỗi cán bộ tối đa một tài khoản (chỉ mục lọc vì SQL Server chỉ cho một NULL trong UNIQUE thường)
         Index("UX_TaiKhoan_MaCanBo", "MaCanBo", unique=True,
               mssql_where=text("MaCanBo IS NOT NULL"), sqlite_where=text("MaCanBo IS NOT NULL")),
     )
@@ -198,7 +193,6 @@ class PhanCongXuLy(Base):
     nghiem_thu = relationship("NghiemThu", back_populates="phan_cong", order_by="NghiemThu.MaNghiemThu")
     __table_args__ = (
         *check_in("TrangThai", TT.PC_ALL, "CK_PhanCong_TrangThai"),
-        # BR07: mỗi báo cáo tối đa một phân công còn hiệu lực
         Index("UX_PhanCong_HieuLuc", "MaBaoCao", unique=True, **where_in("TrangThai", TT.PC_HIEU_LUC)),
         Index("IX_PhanCong_DonVi_TrangThai", "MaDonVi", "TrangThai"),
     )
@@ -271,7 +265,6 @@ class KiemDuyet(Base):
     __table_args__ = (
         *check_in("TrangThai", TT.KD_ALL, "CK_KiemDuyet_TrangThai"),
         check("DangHienThi = 0 OR DaKiemTraAnDanh = 1", "CK_KiemDuyet_AnDanh"),
-        # BR13: mỗi báo cáo tối đa một bản công khai đang hiển thị
         Index("UX_KiemDuyet_HienThi", "MaBaoCao", unique=True,
               mssql_where=text("DangHienThi = 1"), sqlite_where=text("DangHienThi = 1")),
     )
@@ -301,7 +294,6 @@ class ThamSoHeThong(Base):
     can_bo = relationship("CanBoXuLy")
 
 
-# ================= Module M8 — Thiết bị đo IoT =================
 class TramQuanTrac(Base):
     __tablename__ = "TramQuanTrac"
     MaTram = Column(Integer, primary_key=True, autoincrement=True)

@@ -1,4 +1,3 @@
-"""LuuTruTepService — module M3: kiểm tra tệp, vùng tải lên tạm và vùng bằng chứng lâu dài."""
 import os
 import shutil
 import uuid
@@ -16,9 +15,9 @@ DINH_DANG = {".jpg": "jpg", ".jpeg": "jpg", ".png": "png", ".mp4": "mp4"}
 
 @dataclass
 class TepTam:
-    duong_dan: Path      # vị trí trong vùng tạm
+    duong_dan: Path
     ten_goc: str
-    loai: str            # jpg | png | mp4
+    loai: str
     kich_thuoc: int
 
 
@@ -33,7 +32,6 @@ def _dung_chu_ky(loai: str, dau: bytes) -> bool:
 
 
 def tai_len_tam(db: Session, uploads) -> list:
-    """Kiểm tra định dạng, dung lượng, số lượng; lưu vào vùng tạm. Lỗi thì xóa các tệp đã lưu."""
     uploads = [u for u in (uploads or []) if u is not None and getattr(u, "filename", "")]
     yeu_cau(len(uploads) <= tham_so(db, "SO_TEP_TOI_DA"),
             "Chỉ được gửi tối đa %d tệp." % tham_so(db, "SO_TEP_TOI_DA"))
@@ -72,7 +70,6 @@ def tai_len_tam(db: Session, uploads) -> list:
 
 
 def chuyen_sang_lau_dai(tep: TepTam) -> str:
-    """Chuyển tệp từ vùng tạm sang vùng bằng chứng lâu dài; trả về đường dẫn tương đối để lưu CSDL."""
     t = now()
     thu_muc = config.UPLOAD_EVIDENCE / ("%04d" % t.year) / ("%02d" % t.month)
     thu_muc.mkdir(parents=True, exist_ok=True)
@@ -82,7 +79,6 @@ def chuyen_sang_lau_dai(tep: TepTam) -> str:
 
 
 def don_vung_tam(gio=24):
-    """Dọn tệp nằm ở vùng tạm quá 24 giờ (tải lên dở dang, không thành báo cáo) — mục 4.6 của báo cáo."""
     import time
     if not config.UPLOAD_TMP.exists():
         return 0

@@ -1,4 +1,3 @@
-// FormDangNhap, đổi mật khẩu, FormMain (trang chính theo vai trò)
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { guiForm } from "../api.js";
@@ -106,7 +105,6 @@ function TrangChinhCanBo({ d }) {
         <h1>Tổng quan công việc</h1>
         <p className="db-ngay">{thuNgay(d.bay_gio)}</p>
       </div>
-      {/* Dải 5 bước: báo cáo đi qua đúng các bước này. Bước cán bộ phải làm mà đang có việc thì tô màu. */}
       <h2 className="db-h">Báo cáo đang ở bước nào</h2>
       <DongChay ds={[
         ["Tiếp nhận", so.moi, "báo cáo mới gửi", "/can-bo/tiep-nhan", true],

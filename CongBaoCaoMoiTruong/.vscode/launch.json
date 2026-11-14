@@ -1,5 +1,4 @@
 {
-  // F5: chạy web ở chế độ gỡ lỗi (đặt điểm dừng trong app/...). Cần đã chạy chay_he_thong.bat một lần để có .venv.
   "version": "0.2.0",
   "configurations": [
     {

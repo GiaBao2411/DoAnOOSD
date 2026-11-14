@@ -1,4 +1,3 @@
-"""API cho đơn vị xử lý hiện trường: FormNhiemVuHienTruong (UC11), FormCapNhatXuLy (UC12)."""
 from typing import List
 
 from fastapi import APIRouter, Depends, File, Form, UploadFile
@@ -19,7 +18,7 @@ def nhiem_vu(tat_ca: int = 0, trang: int = 1, db: Session = Depends(get_db), tk=
 
 @router.get("/nhiem-vu/{pc}")
 def chi_tiet_nhiem_vu(pc: int, db: Session = Depends(get_db), tk=Depends(don_vi)):
-    return pc_chi_tiet(HT.lay_nhiem_vu(db, pc, tk))     # nhiệm vụ của đơn vị khác -> lỗi nghiệp vụ (BR09)
+    return pc_chi_tiet(HT.lay_nhiem_vu(db, pc, tk))
 
 
 @router.post("/nhiem-vu/{pc}/nhan")
@@ -47,7 +46,6 @@ def ghi_nhan(pc: int, hanh_dong: str = Form("ghi-nhan"), nhan_xet: str = Form(""
 
 @router.get("/cap-nhat")
 def cap_nhat(db: Session = Depends(get_db), tk=Depends(don_vi)):
-    """Các nhiệm vụ đang xử lý (cập nhật tiến độ / gửi kết quả được)."""
     return dict(ds=[pc_tom_tat(p) for p in HT.nhiem_vu_dang_xu_ly(db, tk)])
 
 

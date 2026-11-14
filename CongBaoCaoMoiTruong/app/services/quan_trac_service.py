@@ -1,8 +1,3 @@
-"""QuanTracService — UC13 Gửi số liệu quan trắc, UC14 Theo dõi số liệu quan trắc, quản lý thiết bị trong UC09 (module M8).
-
-Thiết bị đo (Raspberry Pi Pico 2 + MQ135 + TDS) gửi qua cầu nối USB (hoặc Pico W gửi qua WiFi) một HTTP POST dạng JSON:
-    {"ma_thiet_bi": "TRAM01", "khoa": "...", "khong_khi_ppm": 452.3, "tds_ppm": 236.0}
-"""
 import re
 import secrets
 from datetime import timedelta
@@ -19,19 +14,17 @@ MA_RE = re.compile(r"^[A-Za-z0-9_-]{2,20}$")
 
 
 class LoiApi(Exception):
-    """Lỗi trả về cho thiết bị kèm mã HTTP (401: sai mã/khóa, 422: số liệu sai)."""
     def __init__(self, ma_http, thong_bao):
         super().__init__(thong_bao)
         self.ma_http = ma_http
 
 
-# ---------------- UC13: thiết bị gửi số liệu ----------------
 def _so(goi, khoa, toi_da):
     try:
         v = float(goi.get(khoa))
     except (TypeError, ValueError):
         raise LoiApi(422, "Thiếu hoặc sai kiểu giá trị %s." % khoa)
-    if not (0 <= v <= toi_da):  # BR17: ngoài dải đo của cảm biến
+    if not (0 <= v <= toi_da):
         raise LoiApi(422, "%s = %s nằm ngoài dải đo 0..%d." % (khoa, v, toi_da))
     return round(v, 1)
 
@@ -42,12 +35,11 @@ def nhan_so_lieu(db: Session, goi: dict):
     ma = str(goi.get("ma_thiet_bi") or goi.get("ma_tram") or "").strip()
     khoa = str(goi.get("khoa") or "")
     tram = db.scalar(select(M.TramQuanTrac).where(M.TramQuanTrac.MaThietBi == ma)) if ma else None
-    # BR17: sai mã, sai khóa hoặc thiết bị ngừng sử dụng -> 401, không lưu
     if not tram or not tram.DangSuDung or not kiem_tra_bam(khoa, tram.KhoaBam):
         raise LoiApi(401, "Mã thiết bị hoặc khóa không đúng, hoặc thiết bị đã ngừng sử dụng.")
     kk = _so(goi, "khong_khi_ppm", TT.KHI_TOI_DA_PPM)
     tds = _so(goi, "tds_ppm", TT.TDS_TOI_DA_PPM)
-    vuot = kk > tram.NguongKhongKhi or tds > tram.NguongTDS  # BR18
+    vuot = kk > tram.NguongKhongKhi or tds > tram.NguongTDS
     t = now()
     sl = M.SoLieuQuanTrac(MaTram=tram.MaTram, ThoiGianDo=t, KhongKhiPPM=kk, TdsPPM=tds, VuotNguong=vuot)
     db.add(sl)
@@ -56,9 +48,7 @@ def nhan_so_lieu(db: Session, goi: dict):
     return sl
 
 
-# ---------------- UC14: cán bộ theo dõi ----------------
 def mat_ket_noi(db, tram, luc=None):
-    """BR19: quá TRAM_MAT_KET_NOI_PHUT phút không gửi thì mất kết nối."""
     if not tram.LanGuiCuoi:
         return True
     return (luc or now()) - tram.LanGuiCuoi > timedelta(minutes=tham_so(db, "TRAM_MAT_KET_NOI_PHUT"))
@@ -67,7 +57,7 @@ def mat_ket_noi(db, tram, luc=None):
 def ds_tram(db: Session, chi_dang_dung=False):
     s = select(M.TramQuanTrac).order_by(M.TramQuanTrac.MaThietBi)
     if chi_dang_dung:
-        s = s.where(M.TramQuanTrac.DangSuDung == True)  # noqa: E712
+        s = s.where(M.TramQuanTrac.DangSuDung == True)
     return db.scalars(s).all()
 
 
@@ -77,7 +67,6 @@ def moi_nhat(db: Session, ma_tram):
 
 
 def tong_quan(db: Session):
-    """Danh sách thiết bị đang dùng kèm số liệu mới nhất và trạng thái kết nối."""
     t = now()
     out = []
     for tr in ds_tram(db, True):
@@ -91,19 +80,17 @@ def so_lieu(db: Session, ma_tram: int, tu, den, chi_vuot=False, toi_da=2000):
                                         M.SoLieuQuanTrac.ThoiGianDo <= den)
          .order_by(M.SoLieuQuanTrac.ThoiGianDo.desc(), M.SoLieuQuanTrac.MaSoLieu.desc()).limit(toi_da))
     if chi_vuot:
-        s = s.where(M.SoLieuQuanTrac.VuotNguong == True)  # noqa: E712
+        s = s.where(M.SoLieuQuanTrac.VuotNguong == True)
     return db.scalars(s).all()
 
 
 def dem_canh_bao(db: Session):
-    """Cho trang chính: số thiết bị đang vượt ngưỡng và số thiết bị mất kết nối."""
     tq = tong_quan(db)
     return (sum(1 for x in tq if x["moi"] and x["moi"].VuotNguong and not x["mat_ket_noi"]),
             sum(1 for x in tq if x["mat_ket_noi"]))
 
 
 def bieu_do_svg(rows, nguong_kk, nguong_tds, w=900, h=240):
-    """Vẽ biểu đồ đường bằng SVG (không cần Internet, không cần thư viện JS)."""
     if not rows:
         return ""
     rows = sorted(rows, key=lambda r: r.ThoiGianDo)
@@ -146,13 +133,11 @@ def bieu_do_svg(rows, nguong_kk, nguong_tds, w=900, h=240):
     return "".join(g)
 
 
-# ---------------- UC09: quản lý thiết bị (cán bộ) ----------------
 def sinh_khoa():
     return secrets.token_urlsafe(9)
 
 
 def luu_tram(db: Session, ma, ma_thiet_bi, ten, ma_dia_ban, vi_do, kinh_do, nguong_kk, nguong_tds, dang_dung):
-    """Trả về (thiết bị, khóa mới hoặc None). Thiết bị mới được cấp khóa; khóa chỉ hiển thị một lần."""
     ma_thiet_bi = text_req(ma_thiet_bi, "mã thiết bị", 20).upper()
     yeu_cau(MA_RE.match(ma_thiet_bi), "Mã thiết bị chỉ gồm chữ, số, gạch ngang, gạch dưới (2–20 ký tự).")
     ten = text_req(ten, "tên thiết bị", 100)

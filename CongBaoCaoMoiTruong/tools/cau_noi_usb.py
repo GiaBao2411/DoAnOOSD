@@ -1,14 +1,3 @@
-"""Cầu nối USB — chuyển số liệu từ thiết bị đo (Pico 2 cắm cáp USB) lên web (UC13, module M8).
-
-Thiết bị in ra cổng USB các dòng dạng:
-    DATA {"ma_thiet_bi": "TRAM01", "khoa": "...", "khong_khi_ppm": 452.3, "tds_ppm": 236.0}
-Chương trình này đọc từng dòng DATA và gửi HTTP POST tới /api/tram/so-lieu của web.
-
-Cách chạy (ở thư mục gốc dự án, trong lúc web đang chạy; nhớ ĐÓNG Thonny vì Thonny giữ cổng USB):
-    python tools/cau_noi_usb.py                  # tự tìm cổng của mạch Raspberry Pi Pico
-    python tools/cau_noi_usb.py --cong COM5      # chỉ định cổng (xem trong Device Manager > Ports)
-Rút cáp ra thì chương trình chờ và tự kết nối lại khi cắm vào. Bấm Ctrl+C để dừng.
-"""
 import argparse
 import json
 import sys
@@ -23,7 +12,7 @@ except ImportError:
     print("Thiếu thư viện pyserial. Cài bằng lệnh: pip install pyserial")
     sys.exit(1)
 
-VID_RASPBERRY_PI = 0x2E8A   # mã nhà sản xuất USB của các mạch Raspberry Pi Pico / Pico 2
+VID_RASPBERRY_PI = 0x2E8A
 
 
 def tim_cong():
@@ -49,7 +38,6 @@ def gui(url, goi):
 
 
 def xu_ly_dong(dong, url, xem_tat_ca=False):
-    """Xử lý một dòng đọc từ thiết bị. Trả về mã HTTP nếu là dòng DATA, ngược lại None."""
     dong = dong.strip()
     if not dong:
         return None

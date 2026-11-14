@@ -1,5 +1,3 @@
-"""API cho trang công khai của người dân (FormTrangChu, FormGuiBaoCao, FormTraCuu, FormLayLaiMa,
-FormBoSungThongTin) và phục vụ tệp bằng chứng theo quyền."""
 from datetime import timedelta
 from typing import List
 
@@ -31,7 +29,6 @@ def _dia_ban_json(ds):
 
 @router.get("/api/cau-hinh")
 def cau_hinh(db: Session = Depends(get_db)):
-    """Dữ liệu chung cho giao diện: tâm bản đồ, danh mục đang dùng, các bước tiến trình."""
     return dict(map_lat=config.MAP_CENTER_LAT, map_lng=config.MAP_CENTER_LNG, bay_gio=dt(now()),
                 ds_loai=_loai_json(danh_muc_service.ds_loai(db, True)),
                 ds_dia_ban=_dia_ban_json(danh_muc_service.ds_dia_ban(db, True)),
@@ -65,7 +62,6 @@ def gui_bao_cao(bg: BackgroundTasks, mo_ta: str = Form(""), thoi_gian_phat_hien:
     return dict(ma_tra_cuu=bc.MaTraCuu, email=da_gui_mail, mail_bat=email_service.da_cau_hinh())
 
 
-# ---------- Quên mã báo cáo: gửi lại danh sách mã vào email đã dùng khi gửi ----------
 @router.post("/api/quen-ma")
 def quen_ma(request: Request, bg: BackgroundTasks, email: str = Form(""), db: Session = Depends(get_db)):
     email = (email or "").strip().lower()
@@ -74,14 +70,13 @@ def quen_ma(request: Request, bg: BackgroundTasks, email: str = Form(""), db: Se
         raise NghiepVuError("Bạn đã yêu cầu quá nhiều lần. Vui lòng thử lại sau 15 phút.")
     if not email_service.hop_le(email):
         raise NghiepVuError("Địa chỉ email không hợp lệ.")
-    ghi_sai(khoa)                      # mỗi IP tối đa 5 lần / 15 phút, chống dùng trang này để gửi thư rác
+    ghi_sai(khoa)
     ds = db.execute(select(M.BaoCaoSuCo.MaTraCuu, M.BaoCaoSuCo.NgayGui, M.DiaBan.TenDiaBan, M.BaoCaoSuCo.TrangThai)
                     .join(M.NguoiBaoCao, M.NguoiBaoCao.MaNguoiBaoCao == M.BaoCaoSuCo.MaNguoiBaoCao)
                     .join(M.DiaBan, M.DiaBan.MaDiaBan == M.BaoCaoSuCo.MaDiaBan)
                     .where(M.NguoiBaoCao.Email == email).order_by(M.BaoCaoSuCo.NgayGui.desc())).all()
     if ds:
         bg.add_task(email_service.gui_lai_ma, email, [(m, n.strftime("%d/%m/%Y"), p, t) for m, n, p, t in ds])
-    # Luôn trả cùng một câu, không cho biết email có trong hệ thống hay không
     return dict(da_gui=True, email=email)
 
 
@@ -101,7 +96,6 @@ def tra_cuu(ma: str = "", db: Session = Depends(get_db)):
                 cho_bo_sung=bc.TrangThai == TT.BC_CHO_BO_SUNG)
 
 
-# ---------- UC03 Bổ sung thông tin ----------
 def _bc_da_xac_minh(request, db):
     s = request.session.get("bo_sung")
     if not s:
@@ -147,7 +141,6 @@ def bo_sung_thoat(request: Request):
     return dict(ok=True)
 
 
-# ---------- Phục vụ tệp bằng chứng theo quyền (M3, M6) ----------
 @router.get("/tep/{bang}/{ma}")
 def tep(request: Request, bang: str, ma: int, db: Session = Depends(get_db), tk=Depends(nguoi_dung)):
     if bang == "bc":

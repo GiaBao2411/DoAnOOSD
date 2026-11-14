@@ -1,4 +1,3 @@
-"""BoSungService — UC03 Bổ sung thông tin (module M1, M3, M6). BR05, BR14."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -12,7 +11,6 @@ from .tra_cuu_service import tim_theo_ma
 
 
 def xac_minh(db: Session, ma_tra_cuu: str, ip: str) -> M.BaoCaoSuCo:
-    """Tìm báo cáo theo mã báo cáo. Nhập sai mã quá 5 lần thì khóa tạm theo địa chỉ IP (chống dò mã)."""
     khoa = "bs:%s" % ip
     yeu_cau(not bi_khoa_tam(khoa), "Bạn đã nhập sai quá 5 lần. Vui lòng thử lại sau 15 phút.")
     bc = tim_theo_ma(db, ma_tra_cuu)

@@ -1,4 +1,3 @@
-"""Kết nối cơ sở dữ liệu (tầng truy cập dữ liệu)."""
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -25,7 +24,6 @@ TZ = ZoneInfo("Asia/Ho_Chi_Minh")
 
 
 def now() -> datetime:
-    """Giờ Việt Nam, không kèm múi giờ (lưu vào DATETIME2)."""
     return datetime.now(TZ).replace(tzinfo=None, microsecond=0)
 
 

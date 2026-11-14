@@ -1,10 +1,7 @@
-// Định dạng ngày giờ và số. Máy chủ trả thời gian dạng "YYYY-MM-DDTHH:MM:SS" (giờ Việt Nam, không múi giờ).
-
 const NBSP = " ";
 
 export function dt(s) {
   if (!s) return "";
-  // khoảng trắng không ngắt dòng để ngày và giờ luôn nằm trên một dòng trong bảng
   return s.slice(8, 10) + "/" + s.slice(5, 7) + "/" + s.slice(0, 4) + NBSP + s.slice(11, 16);
 }
 
@@ -19,7 +16,6 @@ export function dtGiay(s) {
 }
 
 export function dtNgan(s) {
-  // "12/11 21:05:07"
   if (!s) return "";
   return s.slice(8, 10) + "/" + s.slice(5, 7) + " " + s.slice(11, 19);
 }
@@ -33,7 +29,6 @@ export function gio(s) {
 }
 
 export function giay(s) {
-  // số giây kể từ mốc, để so sánh hai thời điểm cùng múi giờ
   return s ? Date.parse(s.slice(0, 19) + "Z") / 1000 : 0;
 }
 

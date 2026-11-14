@@ -1,5 +1,3 @@
-# hieu_chuan.py — Hiệu chuẩn MQ135 (R0) và TDS (HE_SO_TDS). Chạy bằng Thonny: Stop → mở file → Run.
-# Kết quả: in ra 2 dòng để sửa trong main.py / main_usb_Pico2.py.
 from machine import ADC
 import time
 
@@ -21,10 +19,10 @@ print("=== BƯỚC 1: MQ135 ===")
 print("Cảm biến phải cắm điện ít nhất 30 phút. Đặt chỗ thoáng (gần cửa sổ), không thổi khói.")
 input("Sẵn sàng thì bấm Enter...")
 print("Đang đo 60 giây...")
-v_ao = doc_tb(adc_khi, 60) * 1.5            # điện áp thật ở chân AO (mạch chia áp 10k/20k)
+v_ao = doc_tb(adc_khi, 60) * 1.5
 v_ao = max(v_ao, 0.01)
-rs = (5.0 - v_ao) / v_ao * 10.0             # RL = 10 kΩ trên module
-r0 = rs * 1.5885                            # để không khí sạch ≈ 420 ppm (quy đổi CO2)
+rs = (5.0 - v_ao) / v_ao * 10.0
+r0 = rs * 1.5885
 print("AO = %.2f V, Rs = %.1f kΩ" % (v_ao, rs))
 print(">>> Sửa trong main: R0_MQ135 = %.1f" % r0)
 

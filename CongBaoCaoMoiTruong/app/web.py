@@ -1,5 +1,3 @@
-"""Phần dùng chung của tầng trình bày (API JSON cho giao diện React):
-người dùng hiện tại, phân quyền, chuyển đối tượng dữ liệu thành JSON."""
 from datetime import datetime
 from decimal import Decimal
 
@@ -13,7 +11,6 @@ from .services.common import rv
 from .services.hien_truong_service import khoang_cach_m
 
 
-# ---------------- người dùng hiện tại và phân quyền (M6) ----------------
 def nguoi_dung(request: Request, db: Session = Depends(get_db)):
     ma = request.session.get("ma_tk")
     if not ma:
@@ -64,7 +61,6 @@ def tai_khoan_json(tk):
                 phai_doi_mat_khau=bool(tk.PhaiDoiMatKhau))
 
 
-# ---------------- chuyển dữ liệu sang JSON ----------------
 def dt(v):
     return v.strftime("%Y-%m-%dT%H:%M:%S") if isinstance(v, datetime) else None
 
@@ -76,7 +72,6 @@ def so(v):
 
 
 def trang_json(ds, ham):
-    """Một trang danh sách (đối tượng Trang của services.common)."""
     return dict(items=[ham(x) for x in ds.items], trang=ds.trang, so_trang=ds.so_trang, tong=ds.tong)
 
 
@@ -112,7 +107,6 @@ def nghiem_thu_json(pc):
 
 
 def bc_chi_tiet(bc, lien_he=False):
-    """Chi tiết báo cáo; lien_he=True chỉ dùng cho cán bộ (thông tin người báo cáo)."""
     d = bc_tom_tat(bc)
     d.update(thoi_gian_phat_hien=dt(bc.ThoiGianPhatHien), dia_chi=bc.DiaChi, vi_do=so(bc.ViDo), kinh_do=so(bc.KinhDo),
              ma_dia_ban=bc.MaDiaBan, ly_do_ket_thuc=bc.LyDoKetThuc, rv=rv(bc),

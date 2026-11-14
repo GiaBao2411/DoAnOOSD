@@ -1,4 +1,3 @@
-// Các trang của cán bộ xử lý: FormTiepNhan, FormPhanCong, FormDuyetKetQua, FormKiemDuyet
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { duLieuForm, guiForm } from "../api.js";
 import { dt, dtInput, giay } from "../dinh_dang.js";
@@ -6,7 +5,6 @@ import { BanDoDiem } from "../thanh_phan/ban_do.jsx";
 import { BangLoc, BcInfo, CapNhatList, LichSu, Media, Pager, Tag, TieuDe } from "../thanh_phan/chung.jsx";
 import { useTai, useUngDung } from "../ung_dung.jsx";
 
-// Gửi một thao tác lên máy chủ: thành công -> thông báo xanh và mở trang `url`; lỗi -> thông báo đỏ tại chỗ.
 export function useThaoTac() {
   const { xong, baoTaiCho } = useUngDung();
   return async (url, duLieu, urlXong) => {
@@ -26,7 +24,6 @@ function DongClick({ sel, to, children }) {
   return <tr className={"click " + (sel ? "sel" : "")} onClick={() => navigate(to)}>{children}</tr>;
 }
 
-// ---------------- UC05 Tiếp nhận và kiểm tra ----------------
 export function TiepNhan() {
   const [q] = useSearchParams();
   const tab = q.get("tab") || "moi";
@@ -134,7 +131,6 @@ export function TiepNhan() {
   );
 }
 
-// ---------------- UC06 Phân công xử lý ----------------
 export function PhanCong() {
   const [q] = useSearchParams();
   const ma = +(q.get("ma") || 0);
@@ -206,7 +202,6 @@ export function PhanCong() {
   );
 }
 
-// ---------------- UC07 Duyệt kết quả ----------------
 export function NghiemThu() {
   const [q] = useSearchParams();
   const pcChon = +(q.get("pc") || 0);
@@ -265,7 +260,6 @@ export function NghiemThu() {
   );
 }
 
-// ---------------- UC08 Kiểm duyệt và công khai ----------------
 export function KiemDuyet() {
   const [q] = useSearchParams();
   const ma = +(q.get("ma") || 0);

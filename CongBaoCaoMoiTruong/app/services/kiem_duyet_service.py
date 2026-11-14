@@ -1,4 +1,3 @@
-"""KiemDuyetService — UC08 Kiểm duyệt và công khai (module M7, M6). BR12, BR13."""
 from sqlalchemy import select, update
 from sqlalchemy.orm import Session
 
@@ -20,7 +19,6 @@ def phan_cong_hoan_thanh(bc):
 
 
 def tat_ca_anh(bc):
-    """Mọi ảnh/video có thể chọn công khai: (bảng, đối tượng, nhãn)."""
     out = [("bc", m, "Người dân gửi") for m in bc.minh_chung]
     for pc in bc.phan_cong:
         for cn in pc.cap_nhat:
@@ -29,7 +27,6 @@ def tat_ca_anh(bc):
 
 
 def ban_nhap_mac_dinh(bc):
-    """Bản nháp không chứa họ tên, liên hệ, mã bí mật (M6 — ẩn thông tin cá nhân)."""
     loai = bc.loai.TenLoai if bc.loai else "sự cố môi trường"
     tieu_de = "Đã xử lý %s tại %s" % (loai.lower(), bc.dia_ban.TenDiaBan)
     pc = phan_cong_hoan_thanh(bc)
@@ -67,7 +64,7 @@ def quyet_dinh(db: Session, ma_bc, tieu_de, noi_dung, da_kiem_tra, anh_chon, duy
     bc = kd.bao_cao or db.get(M.BaoCaoSuCo, int(ma_bc))
     if duyet:
         yeu_cau(kd.DaKiemTraAnDanh, "Phải xác nhận đã kiểm tra ẩn thông tin cá nhân trước khi duyệt (BR12).")
-        db.execute(update(M.KiemDuyet).where(M.KiemDuyet.MaBaoCao == bc.MaBaoCao, M.KiemDuyet.DangHienThi == True)  # noqa
+        db.execute(update(M.KiemDuyet).where(M.KiemDuyet.MaBaoCao == bc.MaBaoCao, M.KiemDuyet.DangHienThi == True)
                    .values(DangHienThi=False))
         db.flush()
         kd.TrangThai, kd.DangHienThi, kd.LyDo = TT.KD_DA_DUYET, True, None

@@ -1,4 +1,3 @@
-"""TiepNhanService — UC05 Tiếp nhận và kiểm tra báo cáo (module M4, M3). BR05, BR06."""
 from datetime import timedelta
 
 from sqlalchemy import select, exists, and_
@@ -40,7 +39,6 @@ def _bc(db, ma_bao_cao) -> M.BaoCaoSuCo:
 
 
 def tiep_nhan(db: Session, ma_bao_cao, tk: M.TaiKhoan):
-    """Cán bộ mở báo cáo mới để kiểm tra: Mới gửi → Đang xem xét."""
     bc = _bc(db, ma_bao_cao)
     yeu_cau(bc.TrangThai == TT.BC_MOI_GUI, "Báo cáo không ở trạng thái Mới gửi.")
     bc.MaCanBoTiepNhan = tk.MaCanBo

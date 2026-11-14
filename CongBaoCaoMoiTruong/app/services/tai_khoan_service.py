@@ -1,4 +1,3 @@
-"""TaiKhoanService — UC10 Quản lý tài khoản đơn vị xử lý (module M6). BR16: không xóa tài khoản, chỉ khóa."""
 import re
 import secrets
 
@@ -11,7 +10,6 @@ from .common import bam, text_req, yeu_cau
 
 
 def ds_tai_khoan(db: Session, tu_khoa=None):
-    """Danh sách tài khoản đơn vị xử lý (hệ thống chỉ có một cán bộ quản lý, không quản lý tài khoản cán bộ ở đây)."""
     s = select(M.TaiKhoan).where(M.TaiKhoan.LoaiTaiKhoan == TT.TK_DON_VI).order_by(M.TaiKhoan.TenDangNhap)
     if tu_khoa:
         s = s.where(M.TaiKhoan.TenDangNhap.like("%%%s%%" % tu_khoa.strip().lower()))
@@ -33,7 +31,6 @@ def _mat_khau_tam():
 
 
 def them(db: Session, ten_dang_nhap, ma_don_vi):
-    """Cấp tài khoản cho một đơn vị xử lý. Trả về (tài khoản, mật khẩu tạm)."""
     ten = text_req(ten_dang_nhap, "tên đăng nhập", 50).lower()
     yeu_cau(re.fullmatch(r"[a-z0-9._]{3,50}", ten), "Tên đăng nhập chỉ gồm chữ thường không dấu, số, dấu chấm, gạch dưới (3–50 ký tự).")
     yeu_cau(not db.scalar(select(M.TaiKhoan).where(M.TaiKhoan.TenDangNhap == ten)), "Tên đăng nhập đã tồn tại.")

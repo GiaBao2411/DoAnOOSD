@@ -1,4 +1,3 @@
-// Khung trang: đầu trang, menu theo vai trò, chân trang dùng chung; theo dõi thay đổi để tự cập nhật trang nội bộ.
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, Navigate, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { guiForm, layDuLieu } from "../api.js";
@@ -13,7 +12,6 @@ const LOGO = (
   </svg>
 );
 
-// Trang tự tải lại dữ liệu khi có thay đổi (vd: đơn vị vừa gửi kết quả), trừ khi người dùng đang nhập dở
 const TU_LAM_MOI = ["/trang-chinh", "/can-bo/tiep-nhan", "/can-bo/phan-cong", "/can-bo/nghiem-thu", "/can-bo/kiem-duyet", "/don-vi/nhiem-vu"];
 
 const MENU_CAN_BO = [
@@ -70,7 +68,6 @@ function useTheoDoiThayDoi(bat) {
         s.dau = d.dau;
         s.nt = nt;
       } catch {
-        /* mất mạng tạm thời: lần sau hỏi lại */
       }
     }
     function lap() {
@@ -217,7 +214,6 @@ export default function Khung() {
   );
 }
 
-// Bảo vệ trang nội bộ: chưa đăng nhập -> trang đăng nhập; sai vai trò -> báo không đủ quyền
 export function YeuCau({ vaiTro, children }) {
   const { taiKhoan, daTai } = useUngDung();
   const { pathname, search } = useLocation();

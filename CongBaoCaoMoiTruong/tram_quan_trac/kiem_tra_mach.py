@@ -1,16 +1,12 @@
-# kiem_tra_mach.py — Tự kiểm tra mạch MQ135 + TDS trên Raspberry Pi Pico W / Pico 2
-# Cách chạy: mở Thonny, bấm Stop, mở file này rồi bấm Run (chọn "This computer").
-# Không cần đồng hồ đo. Không ghi đè main.py.
 from machine import ADC, Pin
 import time
 
 V_ADC = 3.3
-adc_khi = ADC(26)    # GP26 (chân 31) <- điểm giữa của 10 kΩ và 20 kΩ (MQ135)
-adc_nuoc = ADC(27)   # GP27 (chân 32) <- chân A của TDS
+adc_khi = ADC(26)
+adc_nuoc = ADC(27)
 
 
 def doc(adc, so_lan=50):
-    """Đọc nhiều lần, trả về (trung bình, nhỏ nhất, lớn nhất) theo volt."""
     ds = []
     for _ in range(so_lan):
         ds.append(adc.read_u16() * V_ADC / 65535)
@@ -19,7 +15,6 @@ def doc(adc, so_lan=50):
 
 
 def kiem_tra_nguon_5v():
-    """Pico W: chân WL_GPIO2 báo có 5 V ở VBUS. Pico 2: GP24."""
     for ten in ("WL_GPIO2", 24):
         try:
             return Pin(ten, Pin.IN).value() == 1
@@ -32,7 +27,6 @@ print("=" * 52)
 print("KIỂM TRA MẠCH THIẾT BỊ ĐO")
 print("=" * 52)
 
-# 1. Nguồn 5 V cho MQ135
 co_5v = kiem_tra_nguon_5v()
 if co_5v is None:
     print("[?] Nguồn 5V (VBUS): không đọc được trên mạch này, bỏ qua.")
@@ -41,7 +35,6 @@ elif co_5v:
 else:
     print("[LỖI] Nguồn 5V (VBUS): KHÔNG CÓ. Pico phải cắm qua cổng USB thì chân 40 mới có 5V.")
 
-# 2. MQ135 qua mạch chia áp
 tb, nho, lon = doc(adc_khi)
 print("\nMQ135 -> GP26: trung bình %.2f V (thấp nhất %.2f, cao nhất %.2f)" % (tb, nho, lon))
 print("        điện áp thật ở chân AO ≈ %.2f V" % (tb * 1.5))
@@ -57,7 +50,6 @@ else:
     if lon - nho > 0.3:
         print("[CHÚ Ý] Số nhảy nhiều: dây lỏng, hoặc MQ135 chưa đủ nóng (đợi 2–5 phút rồi chạy lại).")
 
-# 3. Thử phản ứng của MQ135
 if not loi_mq:
     print("\nTrong 15 giây tới, hãy THỔI hơi cồn / khói nhang vào MQ135 ...")
     goc = tb
@@ -72,7 +64,6 @@ if not loi_mq:
     else:
         print("[CHÚ Ý] MQ135 hầu như không đổi. Thổi gần hơn, hoặc đợi cảm biến nóng 15–30 phút rồi thử lại.")
 
-# 4. TDS
 tb2, nho2, lon2 = doc(adc_nuoc)
 print("\nTDS -> GP27: trung bình %.2f V (thấp nhất %.2f, cao nhất %.2f)" % (tb2, nho2, lon2))
 if tb2 < 0.02:

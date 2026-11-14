@@ -1,4 +1,3 @@
-"""Phần dùng chung của tầng nghiệp vụ: lỗi nghiệp vụ, chuyển trạng thái + ghi lịch sử, tham số, phân trang."""
 import hashlib
 import hmac
 import math
@@ -16,7 +15,7 @@ from ..telemetry import danh_dau
 
 
 class NghiepVuError(Exception):
-    """Vi phạm quy tắc nghiệp vụ — hiển thị cho người dùng."""
+    pass
 
 
 def yeu_cau(dieu_kien, thong_bao):
@@ -24,7 +23,6 @@ def yeu_cau(dieu_kien, thong_bao):
         raise NghiepVuError(thong_bao)
 
 
-# ---------- băm mật khẩu / mã bí mật (PBKDF2-SHA256) ----------
 def bam(gia_tri: str) -> str:
     salt = secrets.token_hex(16)
     h = hashlib.pbkdf2_hmac("sha256", gia_tri.encode("utf-8"), bytes.fromhex(salt), 200_000)
@@ -40,7 +38,6 @@ def kiem_tra_bam(gia_tri: str, chuoi_bam: str) -> bool:
         return False
 
 
-# ---------- chống dò mật khẩu / mã bí mật: sai 5 lần thì khóa 15 phút (bộ nhớ máy chủ, dữ liệu tạm) ----------
 _sai = {}
 
 
@@ -62,7 +59,6 @@ def so_lan_con(khoa: str) -> int:
     return 5 - _sai.get(khoa, (0, None))[0]
 
 
-# ---------- tham số hệ thống ----------
 def tham_so(db: Session, ma: str) -> int:
     ts = db.get(M.ThamSoHeThong, ma)
     if ts is None:
@@ -70,7 +66,6 @@ def tham_so(db: Session, ma: str) -> int:
     return int(ts.GiaTri)
 
 
-# ---------- chuyển trạng thái báo cáo + lịch sử (BR15) ----------
 def chuyen_trang_thai(db: Session, bc: M.BaoCaoSuCo, moi: str, ma_tk, ghi_chu: str = None):
     cu = bc.TrangThai
     yeu_cau(moi in TT.BC_CHUYEN.get(cu, []),
@@ -82,7 +77,6 @@ def chuyen_trang_thai(db: Session, bc: M.BaoCaoSuCo, moi: str, ma_tk, ghi_chu: s
 
 
 def kiem_tra_phien_ban(ban_ghi, rv_gui: str):
-    """Chống cập nhật đè: so RowVersion lúc mở trang với hiện tại (chỉ có hiệu lực trên SQL Server)."""
     hien_tai = getattr(ban_ghi, "RowVersion", None)
     if hien_tai and rv_gui:
         yeu_cau(hien_tai.hex() == rv_gui, "Dữ liệu đã được người khác cập nhật. Vui lòng tải lại trang và thao tác lại.")
@@ -93,7 +87,6 @@ def rv(ban_ghi) -> str:
     return v.hex() if v else ""
 
 
-# ---------- phân trang (SQL Server yêu cầu ORDER BY khi dùng OFFSET) ----------
 class Trang:
     def __init__(self, items, trang, tong):
         self.items, self.trang, self.tong = items, trang, tong

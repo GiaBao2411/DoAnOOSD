@@ -1,4 +1,3 @@
-"""TraCuuService — UC02 Tra cứu báo cáo (module M7, M2). Chỉ đọc, không đổi trạng thái; chi tiết riêng chỉ hiện khi có mã bí mật (BR14)."""
 from sqlalchemy import select, or_
 from sqlalchemy.orm import Session
 
@@ -15,11 +14,10 @@ def tim_theo_ma(db: Session, ma_tra_cuu: str):
 
 
 def ban_cong_khai(db: Session, ma_bao_cao: int):
-    return db.scalar(select(M.KiemDuyet).where(M.KiemDuyet.MaBaoCao == ma_bao_cao, M.KiemDuyet.DangHienThi == True))  # noqa
+    return db.scalar(select(M.KiemDuyet).where(M.KiemDuyet.MaBaoCao == ma_bao_cao, M.KiemDuyet.DangHienThi == True))
 
 
 def anh_cong_khai(bc: M.BaoCaoSuCo):
-    """Ảnh/video được chọn công khai: (giai đoạn, loại bảng, mã, loại tệp)."""
     out = [("Ảnh người dân gửi", "bc", m.MaMinhChung, m.LoaiTep) for m in bc.minh_chung if m.DuocCongKhai]
     for pc in bc.phan_cong:
         for cn in pc.cap_nhat:
@@ -30,7 +28,6 @@ def anh_cong_khai(bc: M.BaoCaoSuCo):
 
 
 def du_lieu_cong_khai(db: Session, bc: M.BaoCaoSuCo):
-    """Dữ liệu người dân được xem: trạng thái, bước, bản công khai (không có thông tin cá nhân)."""
     kd = ban_cong_khai(db, bc.MaBaoCao) if bc.TrangThai == TT.BC_HOAN_TAT else None
     trang_thai_hien_thi = bc.TrangThai
     if bc.TrangThai == TT.BC_CHO_BO_SUNG:
@@ -45,7 +42,7 @@ def du_lieu_cong_khai(db: Session, bc: M.BaoCaoSuCo):
 
 def ban_do_cong_khai(db: Session, ma_loai=None, ma_dia_ban=None):
     stmt = (select(M.BaoCaoSuCo, M.KiemDuyet)
-            .join(M.KiemDuyet, (M.KiemDuyet.MaBaoCao == M.BaoCaoSuCo.MaBaoCao) & (M.KiemDuyet.DangHienThi == True))  # noqa
+            .join(M.KiemDuyet, (M.KiemDuyet.MaBaoCao == M.BaoCaoSuCo.MaBaoCao) & (M.KiemDuyet.DangHienThi == True))
             .where(M.BaoCaoSuCo.TrangThai == TT.BC_HOAN_TAT))
     if ma_loai:
         stmt = stmt.where(M.BaoCaoSuCo.MaLoai == int(ma_loai))
@@ -55,12 +52,11 @@ def ban_do_cong_khai(db: Session, ma_loai=None, ma_dia_ban=None):
 
 
 def tim_noi_bo(db: Session, ma=None, trang_thai=None, ma_loai=None, ma_dia_ban=None, tu=None, den=None, trang=1):
-    """Tra cứu nội bộ cho cán bộ, có lọc và phân trang."""
     stmt = select(M.BaoCaoSuCo)
     if ma:
         stmt = stmt.where(or_(M.BaoCaoSuCo.MaTraCuu.like("%%%s%%" % ma.strip().upper()),
                               M.BaoCaoSuCo.MoTa.like("%%%s%%" % ma.strip())))
-    if trang_thai == TT.LOC_O_DON_VI:  # gộp "Đã phân công" + "Đang xử lý": báo cáo đang nằm ở đơn vị
+    if trang_thai == TT.LOC_O_DON_VI:
         stmt = stmt.where(M.BaoCaoSuCo.TrangThai.in_([TT.BC_DA_PHAN_CONG, TT.BC_DANG_XU_LY]))
     elif trang_thai:
         stmt = stmt.where(M.BaoCaoSuCo.TrangThai == trang_thai)

@@ -1,4 +1,3 @@
-"""PhanCongService — UC06 Phân công xử lý (module M4, M2). BR07, BR08."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -19,8 +18,7 @@ def phan_cong_hieu_luc(db: Session, ma_bao_cao):
 
 
 def goi_y_don_vi(db: Session, bc: M.BaoCaoSuCo):
-    """Gợi ý đơn vị theo địa bàn (M2): đơn vị phụ trách đúng phường/xã xếp trước."""
-    ds = db.scalars(select(M.DonViXuLy).where(M.DonViXuLy.DangSuDung == True).order_by(M.DonViXuLy.TenDonVi)).all()  # noqa
+    ds = db.scalars(select(M.DonViXuLy).where(M.DonViXuLy.DangSuDung == True).order_by(M.DonViXuLy.TenDonVi)).all()
     return sorted(ds, key=lambda d: (d.MaDiaBan != bc.MaDiaBan, d.TenDonVi))
 
 
@@ -36,7 +34,7 @@ def giao_nhiem_vu(db: Session, ma_bao_cao, ma_don_vi, noi_dung, tk, rv=None):
     t = now()
 
     cu = phan_cong_hieu_luc(db, bc.MaBaoCao)
-    if cu:  # giao lại: phân công cũ chuyển Đã thay thế trong cùng giao dịch
+    if cu:
         yeu_cau(cu.TrangThai != TT.PC_CHO_NGHIEM_THU, "Đơn vị đã gửi kết quả, hãy duyệt kết quả thay vì giao lại.")
         cu.TrangThai = TT.PC_DA_THAY_THE
         db.flush()

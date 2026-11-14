@@ -1,4 +1,3 @@
-// Các trang của cán bộ: FormThietBiDo (UC14), FormTraCuu nội bộ (UC02)
 import { useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { dt, dtGiay, dtInput, dtNgan, giay, so0, so1 } from "../dinh_dang.js";
@@ -6,7 +5,6 @@ import { BanDoDiem, BanDoXem, escHtml } from "../thanh_phan/ban_do.jsx";
 import { BangLoc, BcInfo, LichSu, Media, Pager, Tag, TieuDe } from "../thanh_phan/chung.jsx";
 import { useTai, useUngDung } from "../ung_dung.jsx";
 
-// Biểu đồ đường số liệu theo thời gian (SVG, không cần thư viện)
 function BieuDo({ rows, nguongKk, nguongTds, w = 900, h = 240 }) {
   if (!rows.length) return null;
   const r = [...rows].sort((a, b) => giay(a.thoi_gian) - giay(b.thoi_gian));
@@ -49,7 +47,6 @@ function BieuDo({ rows, nguongKk, nguongTds, w = 900, h = 240 }) {
   );
 }
 
-// ---------------- UC14 Theo dõi số liệu của thiết bị đo ----------------
 export function ThietBiDo() {
   const [q, datQ] = useSearchParams();
   const tudong = q.get("tu_dong") === "1";
@@ -121,7 +118,6 @@ export function ThietBiDo() {
               <div style={{ flex: "0 0 auto", minWidth: 0 }}><button className="btn">Xem</button></div>
             </form>
             <label style={{ fontWeight: 400, marginTop: 8 }}><input type="checkbox" id="tudong" checked={tudong} onChange={(e) => {
-              // tự làm mới: bỏ khoảng thời gian cố định để luôn xem 3 giờ gần nhất
               const p = new URLSearchParams(q);
               p.delete("tu");
               p.delete("den");
@@ -166,7 +162,6 @@ function DongTram({ sel, ma, children }) {
   }}>{children}</tr>;
 }
 
-// ---------------- UC02 Tra cứu nội bộ ----------------
 export function TraCuuNoiBo() {
   const [q] = useSearchParams();
   const navigate = useNavigate();

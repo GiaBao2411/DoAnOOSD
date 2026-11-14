@@ -1,4 +1,3 @@
-"""API phần quản lý của cán bộ (một cán bộ quản lý toàn hệ thống): FormDanhMuc, FormTaiKhoan (tài khoản đơn vị)."""
 from fastapi import APIRouter, Depends, Form
 from sqlalchemy.orm import Session
 

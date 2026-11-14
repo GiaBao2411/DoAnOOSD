@@ -1,62 +1,42 @@
-# =====================================================================
-#  TRẠM QUAN TRẮC MÔI TRƯỜNG (Module M8) — Raspberry Pi Pico W, MicroPython
-#  Bản GỬI QUA WiFi (bản chính). Nạp vào Pico W với tên main.py.
-#  Đồ án: Cổng báo cáo sự cố môi trường và xử lý hiện trường
-#  Sinh viên: Huỳnh Gia Bảo - 1250080014
-#
-#  Cảm biến:
-#    - MQ135 (chất lượng không khí)  -> chân GP26 (ADC0), qua mạch chia áp 10k/20k
-#    - TDS   (chất rắn hòa tan, nước) -> chân GP27 (ADC1), nối thẳng
-#  Trên Wokwi: 2 cảm biến được thay bằng 2 BIẾN TRỞ (vặn để giả lập ô nhiễm).
-#  Chạy trên mạch thật: giữ nguyên code, chỉ sửa WIFI_SSID, WIFI_PASS, SERVER_URL.
-# =====================================================================
 import time
 import json
 import network
 from machine import ADC, Pin
 
 try:
-    import requests            # MicroPython bản mới
+    import requests
 except ImportError:
-    import urequests as requests  # MicroPython bản cũ
+    import urequests as requests
 
-# ---------------- CẤU HÌNH ----------------
-WIFI_SSID = "Wokwi-GUEST"      # Wokwi: mạng WiFi ảo có sẵn. Mạch thật: tên WiFi nhà bạn
-WIFI_PASS = ""                 # Wokwi: để trống. Mạch thật: mật khẩu WiFi
-MA_TRAM = "TRAM01"             # mã thiết bị (MaThietBi trong bảng TramQuanTrac)
-KHOA_TRAM = "KhoaTram01"      # khóa của trạm (TRAM01 mẫu); trạm thêm mới thì lấy khóa ở Danh mục > Trạm quan trắc
+WIFI_SSID = "Wokwi-GUEST"
+WIFI_PASS = ""
+MA_TRAM = "TRAM01"
+KHOA_TRAM = "KhoaTram01"
 
-# Địa chỉ nhận dữ liệu (xem README.md mục 3):
-#  - Thử WiFi trên Wokwi: "http://httpbin.org/post" (trang thử nghiệm, chỉ trả lại gói đã nhận)
-#  - Pico W thật cùng WiFi với laptop: "http://<IP laptop>:8000/api/tram/so-lieu" (chạy chay_he_thong.bat)
-#  - Để trống "" nếu chỉ muốn in số liệu ra màn hình, không gửi.
-SERVER_URL = "http://192.168.1.10:8000/api/tram/so-lieu"   # đổi 192.168.1.10 thành IPv4 laptop (backend in ra khi chạy)
+SERVER_URL = "http://192.168.1.10:8000/api/tram/so-lieu"
 
-CHU_KY_GIAY = 10               # bao nhiêu giây đọc và gửi 1 lần
+CHU_KY_GIAY = 10
 
-NGUONG_KHONG_KHI_PPM = 1000    # vượt ngưỡng này in 'VUOT NGUONG' (máy chủ dùng ngưỡng riêng của trạm)
-NGUONG_TDS_PPM = 1000          # vượt ngưỡng này coi là nước ô nhiễm (ngưỡng demo, chỉnh được)
+NGUONG_KHONG_KHI_PPM = 1000
+NGUONG_TDS_PPM = 1000
 
-# ---------------- CHÂN KẾT NỐI ----------------
-adc_khi = ADC(26)              # GP26 = ADC0 <- MQ135
-adc_nuoc = ADC(27)             # GP27 = ADC1 <- TDS
-led_tren_mach = Pin("LED", Pin.OUT)  # đèn trên Pico W, nháy mỗi lần gửi
+adc_khi = ADC(26)
+adc_nuoc = ADC(27)
+led_tren_mach = Pin("LED", Pin.OUT)
 
-# ---------------- HẰNG SỐ CẢM BIẾN ----------------
-V_ADC = 3.3                    # Pico đọc điện áp 0 - 3.3V
-HE_SO_CHIA_AP_KHI = 1.5        # MQ135 qua chia áp 10k (trên) + 20k (dưới): V_that = V_doc * (10+20)/20
+V_ADC = 3.3
+HE_SO_CHIA_AP_KHI = 1.5
 V_NGUON_MQ135 = 5.0
-RL_MQ135 = 10.0                # điện trở tải trên module MQ135 (kΩ)
-R0_MQ135 = 76.63               # điện trở chuẩn trong không khí sạch (kΩ) — chạy hieu_chuan.py để tính, rồi sửa số này
-A_MQ135, B_MQ135 = 116.6020682, 2.769034857   # hệ số đường cong CO2 trong datasheet MQ135
-KHI_TOI_DA_PPM = 5000.0        # giới hạn hiển thị (ngoài dải đo tin cậy của MQ135)
-NHIET_DO_NUOC = 25.0           # TDS phụ thuộc nhiệt độ; chưa có cảm biến nhiệt thì giả sử 25°C
-HE_SO_TDS = 1.0                # hệ số hiệu chuẩn TDS (chạy hieu_chuan.py để tính, rồi sửa số này)
+RL_MQ135 = 10.0
+R0_MQ135 = 76.63
+A_MQ135, B_MQ135 = 116.6020682, 2.769034857
+KHI_TOI_DA_PPM = 5000.0
+NHIET_DO_NUOC = 25.0
+HE_SO_TDS = 1.0
 
 
 def doc_dien_ap(adc, so_lan=10):
-    """Đọc trung bình nhiều lần cho ổn định, trả về điện áp (V)."""
-    adc.read_u16()                 # bỏ lần đọc đầu sau khi đổi kênh ADC (tránh lẫn số của cảm biến kia)
+    adc.read_u16()
     time.sleep_ms(2)
     tong = 0
     for _ in range(so_lan):
@@ -66,16 +46,14 @@ def doc_dien_ap(adc, so_lan=10):
 
 
 def tinh_khong_khi_ppm(v_doc):
-    """Đổi điện áp MQ135 ra nồng độ khí ước lượng (ppm, quy đổi theo CO2)."""
     v = max(v_doc * HE_SO_CHIA_AP_KHI, 0.01)
     rs = (V_NGUON_MQ135 - v) / v * RL_MQ135
     rs = max(rs, 0.01)
     ppm = A_MQ135 * (rs / R0_MQ135) ** (-B_MQ135)
-    return min(ppm, KHI_TOI_DA_PPM)   # quá dải đo của MQ135 thì giữ ở mức tối đa
+    return min(ppm, KHI_TOI_DA_PPM)
 
 
 def tinh_tds_ppm(v):
-    """Công thức chuẩn của cảm biến TDS (có bù nhiệt độ)."""
     v_bu = v / (1.0 + 0.02 * (NHIET_DO_NUOC - 25.0))
     return (133.42 * v_bu ** 3 - 255.86 * v_bu ** 2 + 857.39 * v_bu) * 0.5 * HE_SO_TDS
 
@@ -98,7 +76,6 @@ def ket_noi_wifi(cho_toi_da=15):
 
 
 def gui_so_lieu(goi):
-    """Gửi gói số liệu dạng JSON tới SERVER_URL. Trả về True nếu gửi thành công."""
     if not SERVER_URL:
         return False
     try:
@@ -108,12 +85,11 @@ def gui_so_lieu(goi):
         print("   -> Gui toi may chu: HTTP", r.status_code, "(thanh cong)" if ok else "(loi)")
         r.close()
         return ok
-    except Exception as e:  # mất mạng, máy chủ tắt...
+    except Exception as e:
         print("   -> Gui that bai:", e)
         return False
 
 
-# ---------------- CHƯƠNG TRÌNH CHÍNH ----------------
 print("=== TRAM QUAN TRAC %s khoi dong ===" % MA_TRAM)
 wlan = ket_noi_wifi()
 lan_do = 0

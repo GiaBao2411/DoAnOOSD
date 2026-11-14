@@ -1,4 +1,3 @@
-"""BaoCaoService — UC01 Gửi báo cáo sự cố (module M1, dùng M2, M3)."""
 import re
 import uuid
 
@@ -10,7 +9,6 @@ from ..db import now
 from . import email_service
 from . import luu_tru_tep_service as LT
 from .common import NghiepVuError, chuyen_trang_thai, parse_dt, text_req, yeu_cau
-
 
 
 def _so_thuc(s, ten, lo, hi):
@@ -26,7 +24,6 @@ def _so_thuc(s, ten, lo, hi):
 
 def gui_bao_cao(db: Session, mo_ta, thoi_gian_phat_hien, ma_dia_ban, dia_chi, vi_do, kinh_do,
                 ho_ten, so_dien_thoai, tep_tai_len, email=None):
-    """Trả về báo cáo vừa tạo. Lưu báo cáo, bằng chứng, lịch sử trong một giao dịch (BR01, BR02)."""
     mo_ta = text_req(mo_ta, "mô tả sự cố")
     tg = parse_dt(thoi_gian_phat_hien, "thời gian phát hiện")
     yeu_cau(tg <= now(), "Thời gian phát hiện không được sau thời điểm gửi.")
@@ -43,7 +40,7 @@ def gui_bao_cao(db: Session, mo_ta, thoi_gian_phat_hien, ma_dia_ban, dia_chi, vi
     email = (email or "").strip().lower() or None
     yeu_cau(email is None or email_service.hop_le(email), "Địa chỉ email không hợp lệ.")
 
-    teps = LT.tai_len_tam(db, tep_tai_len)                 # M3: kiểm tra tệp, lưu vùng tạm
+    teps = LT.tai_len_tam(db, tep_tai_len)
     yeu_cau(teps, "Báo cáo phải có ít nhất một ảnh hoặc video làm bằng chứng.")
     da_chuyen = []
     try:

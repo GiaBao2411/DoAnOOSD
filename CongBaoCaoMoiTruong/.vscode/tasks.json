@@ -1,5 +1,4 @@
 {
-  // Các việc chạy nhanh trong VS Code: Terminal -> Run Task... (hoặc Ctrl+Shift+B để chạy hệ thống)
   "version": "2.0.0",
   "options": { "shell": { "executable": "cmd.exe", "args": ["/d", "/c"] } },
   "tasks": [

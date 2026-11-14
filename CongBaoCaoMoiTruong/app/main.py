@@ -1,8 +1,3 @@
-"""Điểm khởi động ứng dụng Cổng báo cáo sự cố môi trường và xử lý hiện trường.
-
-Kiến trúc: giao diện React (thư mục frontend, bản đã build nằm ở frontend/dist) gọi API JSON của FastAPI
-dưới đường dẫn /api; FastAPI vừa trả API vừa phục vụ các tệp của giao diện React.
-"""
 import os
 import socket
 from contextlib import asynccontextmanager
@@ -22,11 +17,10 @@ from .telemetry import bat_giam_sat
 
 
 def _ip_laptop():
-    """IPv4 của card mạng đang ra Internet (WiFi) và các IPv4 khác của máy (giống ipconfig)."""
     chinh = None
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        s.connect(("8.8.8.8", 80))  # UDP: không gửi gói nào, chỉ để Windows chọn card mạng
+        s.connect(("8.8.8.8", 80))
         chinh = s.getsockname()[0]
     except OSError:
         pass
@@ -40,7 +34,6 @@ def _ip_laptop():
 
 
 def _in_dia_chi():
-    """In địa chỉ web và IPv4 của laptop khi chạy backend (giống chay_he_thong.bat)."""
     cong = os.environ.get("PORT", "8000")
     chinh, khac = _ip_laptop()
     print("=" * 60)
@@ -60,8 +53,8 @@ def _in_dia_chi():
 @asynccontextmanager
 async def _khoi_dong(app):
     from .services.luu_tru_tep_service import don_vung_tam
-    don_vung_tam()  # dọn tệp tạm quá 24 giờ
-    _in_dia_chi()   # in IPv4 của laptop để sửa SERVER_URL cho Pico W
+    don_vung_tam()
+    _in_dia_chi()
     yield
 
 
@@ -73,10 +66,9 @@ app.add_middleware(SessionMiddleware, secret_key=config.SECRET_KEY, session_cook
 for r in (public.router, auth.router, canbo.router, quan_ly.router, donvi.router, api.router):
     app.include_router(r)
 
-bat_giam_sat(app, engine)   # OpenTelemetry: chỉ bật khi có OTEL_EXPORTER_OTLP_ENDPOINT
+bat_giam_sat(app, engine)
 
 
-# ---------------- lỗi trả về dạng JSON {"loi": "..."} để giao diện hiển thị ----------------
 @app.exception_handler(NghiepVuError)
 async def _loi_nghiep_vu(request: Request, exc: NghiepVuError):
     return JSONResponse({"loi": str(exc)}, status_code=400)
@@ -85,7 +77,7 @@ async def _loi_nghiep_vu(request: Request, exc: NghiepVuError):
 @app.exception_handler(StarletteHTTPException)
 async def _loi_http(request: Request, exc: StarletteHTTPException):
     if not request.url.path.startswith(("/api/", "/tep/")) and exc.status_code == 404 and request.method == "GET":
-        return _trang_react()          # đường dẫn của giao diện (vd /can-bo/tiep-nhan) -> trả index.html
+        return _trang_react()
     loi = exc.detail if isinstance(exc.detail, str) else "Có lỗi xảy ra."
     if exc.status_code == 404 and loi == "Not Found":
         loi = "Không tìm thấy."
@@ -97,7 +89,6 @@ async def _loi_du_lieu(request: Request, exc: RequestValidationError):
     return JSONResponse({"loi": "Dữ liệu gửi lên không hợp lệ."}, status_code=422)
 
 
-# ---------------- phục vụ giao diện React đã build ----------------
 DIST = config.BASE_DIR / "frontend" / "dist"
 if (DIST / "assets").is_dir():
     app.mount("/assets", StaticFiles(directory=str(DIST / "assets")), name="assets")

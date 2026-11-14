@@ -1,13 +1,3 @@
-"""Giả lập thiết bị đo IoT (thay cho mạch Pico thật) — gửi số liệu về web mỗi vài giây.
-
-Cách chạy (ở thư mục gốc dự án, trong lúc web đang chạy):
-    python tools/gia_lap_tram.py                       # TRAM01 và TRAM02, 10 giây/lần
-    python tools/gia_lap_tram.py --tram TRAM03:KhoaTram03 --chu-ky 5
-    python tools/gia_lap_tram.py --url http://192.168.1.10:8000/api/tram/so-lieu
-
-Gói tin gửi đi giống hệt gói của mạch Pico (tram_quan_trac/main.py): ma_thiet_bi, khoa, khong_khi_ppm, tds_ppm.
-Bấm Ctrl+C để dừng. Chỉ dùng thư viện có sẵn của Python.
-"""
 import argparse
 import json
 import math
@@ -43,7 +33,7 @@ def main():
         for i, (ma, khoa) in enumerate(trams):
             kk = 430 + 60 * math.sin(k / 6 + i) + rnd.uniform(-20, 20)
             tds = 250 + 80 * i + rnd.uniform(-15, 15)
-            if (k + 7 * i) % 30 in range(20, 25):   # thỉnh thoảng có khói / nước thải để thấy vượt ngưỡng
+            if (k + 7 * i) % 30 in range(20, 25):
                 kk += rnd.uniform(700, 1200)
                 tds += rnd.uniform(500, 900)
             goi = {"ma_thiet_bi": ma, "khoa": khoa, "khong_khi_ppm": round(kk, 1), "tds_ppm": round(tds, 1)}

@@ -1,4 +1,3 @@
-// Các trang công khai của người dân: FormTrangChu, FormGuiBaoCao, FormLayLaiMa, FormTraCuu, FormBoSungThongTin
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { duLieuForm, guiForm } from "../api.js";
@@ -7,7 +6,6 @@ import { BanDoChon, BanDoXem, escHtml, layViTri, rutGon, timDiaChi, timToaDo } f
 import { BangLoc, ChonTep, Media, TieuDe } from "../thanh_phan/chung.jsx";
 import { useTai, useUngDung } from "../ung_dung.jsx";
 
-// ---------------- Trang chủ: bản đồ sự cố đã xử lý ----------------
 export function TrangChu() {
   const [q, datQ] = useSearchParams();
   const loai = q.get("loai") || "";
@@ -75,7 +73,6 @@ export function TrangChu() {
   );
 }
 
-// ---------------- Gửi báo cáo sự cố (UC01) ----------------
 export function GuiBaoCao() {
   const { cauHinh, baoTaiCho } = useUngDung();
   const [ketQua, datKetQua] = useState(null);
@@ -83,7 +80,7 @@ export function GuiBaoCao() {
   const [viDo, datViDo] = useState("");
   const [kinhDo, datKinhDo] = useState("");
   const [ghiChu, datGhiChu] = useState("");
-  const [lan, datLan] = useState(0);              // tăng lên để làm mới form
+  const [lan, datLan] = useState(0);
   const [dangGui, datDangGui] = useState(false);
   const banDo = useRef(null);
   const diaChi = useRef(null);
@@ -98,7 +95,6 @@ export function GuiBaoCao() {
     const w = phuong.current;
     return w && w.value ? w.options[w.selectedIndex].text.trim() : "";
   }
-  // Ô Phường/xã còn trống mà tên phường tìm được có trong danh sách thì chọn sẵn
   function chonPhuong(kq) {
     const w = phuong.current;
     if (!w || w.value) return;
@@ -110,8 +106,6 @@ export function GuiBaoCao() {
     datViDo((+lat).toFixed(6));
     datKinhDo((+lng).toFixed(6));
   }
-  // Bấm lên bản đồ / kéo ghim / lấy GPS -> tìm tên địa điểm ở đó và điền vào ô địa chỉ
-  // (chỉ điền khi ô đang trống hoặc đang chứa địa chỉ do chương trình tự điền).
   function khiChon(lat, lng) {
     datDiem(lat, lng);
     const s = tim.current;
@@ -132,10 +126,9 @@ export function GuiBaoCao() {
           s.tuDien = dc;
           s.daTim = dc + "|" + tenPhuong();
         }
-      } catch { /* không có Internet */ }
+      } catch {  }
     }, 500);
   }
-  // Nhập địa chỉ -> tìm tọa độ -> đặt ghim lên bản đồ (sau khi ngừng gõ ~1 giây, Enter hoặc rời ô)
   async function timTheoDiaChi() {
     const s = tim.current;
     const dc = diaChi.current.value.trim();
@@ -151,7 +144,7 @@ export function GuiBaoCao() {
     cach.push(dc + ", Thành phố Hồ Chí Minh", dc);
     try {
       for (let i = 0; i < cach.length; i++) {
-        if (i) await new Promise((r) => setTimeout(r, 1100));   // Nominatim cho tối đa 1 yêu cầu mỗi giây
+        if (i) await new Promise((r) => setTimeout(r, 1100));
         if (toi !== s.luot) return;
         const kq = await timToaDo(cach[i], banDo.current.tam());
         if (toi !== s.luot) return;
@@ -265,7 +258,6 @@ function GuiThanhCong({ kq }) {
   );
 }
 
-// ---------------- Lấy lại mã báo cáo qua email ----------------
 export function QuenMa() {
   const [daGui, datDaGui] = useState(null);
   const [loi, datLoi] = useState(null);
@@ -306,7 +298,6 @@ export function QuenMa() {
   );
 }
 
-// ---------------- Tra cứu báo cáo (người dân) ----------------
 export function TraCuu() {
   const [q] = useSearchParams();
   const navigate = useNavigate();
@@ -362,7 +353,6 @@ export function TraCuu() {
   );
 }
 
-// ---------------- Bổ sung thông tin (UC03) ----------------
 export function BoSung() {
   const { xong, baoTaiCho } = useUngDung();
   const t = useTai("/api/bo-sung");

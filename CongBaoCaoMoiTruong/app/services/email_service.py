@@ -1,8 +1,3 @@
-"""EmailService — gửi mã báo cáo về email thật của người dân qua máy chủ SMTP (mặc định Gmail).
-
-Cấu hình trong tệp .env: SMTP_USER (địa chỉ Gmail gửi đi), SMTP_PASSWORD (mật khẩu ứng dụng 16 ký tự của Google),
-DIA_CHI_WEB (địa chỉ mở web, để gắn đường dẫn tra cứu vào thư). Chưa cấu hình thì hệ thống vẫn chạy, chỉ không gửi thư.
-"""
 import html
 import logging
 import re
@@ -40,14 +35,13 @@ def _gui_smtp(den: str, tieu_de: str, van_ban: str, trang_html: str):
 
 
 def _gui_an_toan(den: str, tieu_de: str, van_ban: str, trang_html: str):
-    """Chạy sau khi trang đã trả về cho người dân; lỗi gửi thư chỉ ghi log, không làm hỏng báo cáo đã lưu."""
     if not da_cau_hinh():
         log.warning("Chưa cấu hình SMTP_USER / SMTP_PASSWORD trong .env — bỏ qua gửi thư tới %s", den)
         return
     try:
         _gui_smtp(den, tieu_de, van_ban, trang_html)
         log.info("Đã gửi thư '%s' tới %s", tieu_de, den)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         log.error("Gửi thư tới %s thất bại: %s", den, e)
         print("[EMAIL] Gửi thư tới %s thất bại: %s" % (den, e))
 
@@ -81,7 +75,6 @@ def gui_ma_bao_cao(den: str, ma: str, ngay_gui: str, phuong: str, mo_ta: str):
 
 
 def gui_lai_ma(den: str, ds: list):
-    """ds: danh sách (mã, ngày gửi, phường/xã, trạng thái) của các báo cáo gửi bằng email này."""
     tieu_de = "Các mã báo cáo sự cố bạn đã gửi"
     goc = config.DIA_CHI_WEB.rstrip("/")
     van_ban = "Các báo cáo đã gửi bằng email này:\n\n" + "\n".join(

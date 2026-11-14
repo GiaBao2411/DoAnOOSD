@@ -1,5 +1,3 @@
-// Trạng thái dùng chung của giao diện: tài khoản đang đăng nhập, cấu hình, thông báo nhanh (flash),
-// số việc chờ trên menu và cơ chế tự cập nhật trang nội bộ.
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { layDuLieu } from "./api.js";
@@ -27,20 +25,17 @@ export function NenUngDung({ children }) {
     layDuLieu("/api/cau-hinh").then(datCauHinh).catch(() => {});
   }, []);
 
-  // Thông báo chờ (loc = null) gắn vào trang vừa mở; thông báo của trang trước bị xóa.
   useEffect(() => {
     viTri.current = location.key;
     datFlashes((fs) => fs.filter((f) => f.loc === null || f.loc === location.key).map((f) => ({ ...f, loc: location.key })));
   }, [location.key]);
 
-  // Hiện thông báo ngay trên trang hiện tại (không chuyển trang)
   const baoTaiCho = useCallback((noiDung, loai = "err") => {
     soFlash += 1;
-    datFlashes([{ id: soFlash, loai, nd: noiDung, loc: viTri.current }]);   // giống tải lại trang: chỉ còn thông báo lỗi mới
+    datFlashes([{ id: soFlash, loai, nd: noiDung, loc: viTri.current }]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  // Thao tác thành công: hiện thông báo rồi mở trang `url` (mặc định: tải lại trang hiện tại), giống POST rồi chuyển hướng.
   const xong = useCallback(
     (noiDung, url, loai = "ok", trangThai) => {
       soFlash += 1;
@@ -57,7 +52,6 @@ export function NenUngDung({ children }) {
   return <UngDung.Provider value={giaTri}>{children}</UngDung.Provider>;
 }
 
-// Tải dữ liệu của một trang; tự tải lại khi đổi đường dẫn, khi vừa thao tác xong, hoặc khi có thay đổi mới.
 export function useTai(url) {
   const { lamMoi, datTaiKhoan } = useUngDung();
   const location = useLocation();

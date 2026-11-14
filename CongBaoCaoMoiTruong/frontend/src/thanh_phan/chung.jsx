@@ -1,4 +1,3 @@
-// Các thành phần giao diện dùng chung (tương ứng các macro của giao diện cũ).
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { boDau, dt } from "../dinh_dang.js";
@@ -27,7 +26,6 @@ export function Flash() {
 }
 
 export function TieuDe({ children }) {
-  // đặt tiêu đề tab trình duyệt
   if (typeof document !== "undefined") document.title = children;
   return null;
 }
@@ -87,7 +85,6 @@ export function LichSu({ ds }) {
   );
 }
 
-// Phân trang phía máy chủ: ds = {trang, so_trang, tong}; coSo = đường dẫn hiện tại không có tham số trang.
 export function Pager({ ds, coSo }) {
   const noi = coSo + (coSo.includes("?") ? "&" : "?");
   const so = [];
@@ -112,8 +109,6 @@ export function Pager({ ds, coSo }) {
   );
 }
 
-// Bảng dài: ô tìm nhanh + phân trang ngay trên trình duyệt (mỗi trang `soDong` dòng). Bảng ít dòng hơn thì để nguyên.
-// dong = [{key, chu (chữ để tìm), el (thẻ <tr>), sel}]
 export function BangLoc({ dau, dong, soDong = 10, rong, cuon = false, style, className = "t" }) {
   const [tu, datTu] = useState("");
   const chonIdx = dong.findIndex((r) => r.sel);
@@ -174,7 +169,6 @@ export function BangLoc({ dau, dong, soDong = 10, rong, cuon = false, style, cla
   );
 }
 
-// Xem trước các tệp vừa chọn (ảnh/video)
 export function ChonTep({ name = "tep", required = false, xem, datXem }) {
   return (
     <>
@@ -192,7 +186,6 @@ export function ChonTep({ name = "tep", required = false, xem, datXem }) {
   );
 }
 
-// Danh sách ghi nhận, tiến độ, kết quả của đơn vị
 export function CapNhatList({ ds }) {
   return (
     <div className="timeline">

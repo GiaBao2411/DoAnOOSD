@@ -1,4 +1,3 @@
-"""XacThucService — UC04 Đăng nhập, đổi mật khẩu (module M6)."""
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 

@@ -1,4 +1,3 @@
-"""ApiSoLieuQuanTrac — điểm nhận số liệu của thiết bị đo IoT (UC13, module M8). Không có giao diện."""
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
@@ -18,7 +17,7 @@ async def post_so_lieu(request: Request, db: Session = Depends(get_db)):
     except Exception:
         return JSONResponse({"ok": False, "loi": "Nội dung không phải JSON hợp lệ."}, status_code=400)
     try:
-        sl = await run_in_threadpool(QT.nhan_so_lieu, db, goi)  # băm khóa tốn CPU: chạy ngoài vòng lặp sự kiện
+        sl = await run_in_threadpool(QT.nhan_so_lieu, db, goi)
     except QT.LoiApi as e:
         db.rollback()
         danh_dau("thiet_bi.tu_choi", ma_thiet_bi=str(goi.get("ma_thiet_bi", "")) if isinstance(goi, dict) else "", ma_http=e.ma_http)

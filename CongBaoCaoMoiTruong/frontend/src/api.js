@@ -1,5 +1,3 @@
-// Gọi API JSON của máy chủ FastAPI. Mọi lỗi máy chủ trả về dạng {"loi": "..."}.
-
 export class LoiApi extends Error {
   constructor(thongBao, maHttp) {
     super(thongBao);
@@ -28,7 +26,6 @@ export async function layDuLieu(url) {
   return docKetQua(r);
 }
 
-// Gửi dữ liệu form (kể cả tệp) bằng multipart/form-data, giống form HTML.
 export async function guiForm(url, duLieu) {
   let body = duLieu;
   if (!(duLieu instanceof FormData)) {
@@ -47,7 +44,6 @@ export async function guiForm(url, duLieu) {
   return docKetQua(r);
 }
 
-// Lấy dữ liệu form kèm giá trị của nút bấm đã gửi form (vd name="hanh_dong" value="duyet").
 export function duLieuForm(e) {
   const fd = new FormData(e.target);
   const nut = e.nativeEvent && e.nativeEvent.submitter;

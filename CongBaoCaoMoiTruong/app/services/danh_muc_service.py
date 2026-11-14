@@ -1,5 +1,3 @@
-"""DanhMucService — UC09 Quản lý danh mục (module M4). BR16: không xóa, chỉ ngừng sử dụng."""
-
 from sqlalchemy import select, func
 from sqlalchemy.orm import Session
 
@@ -9,20 +7,19 @@ from ..db import now
 from .common import text_req, yeu_cau
 
 
-
 def ds_loai(db, chi_dang_dung=False):
     s = select(M.LoaiSuCo).order_by(M.LoaiSuCo.MaLoai)
-    return db.scalars(s.where(M.LoaiSuCo.DangSuDung == True) if chi_dang_dung else s).all()  # noqa
+    return db.scalars(s.where(M.LoaiSuCo.DangSuDung == True) if chi_dang_dung else s).all()
 
 
 def ds_dia_ban(db, chi_dang_dung=False):
     s = select(M.DiaBan).order_by(M.DiaBan.TenDiaBan)
-    return db.scalars(s.where(M.DiaBan.DangSuDung == True) if chi_dang_dung else s).all()  # noqa
+    return db.scalars(s.where(M.DiaBan.DangSuDung == True) if chi_dang_dung else s).all()
 
 
 def ds_don_vi(db, chi_dang_dung=False):
     s = select(M.DonViXuLy).order_by(M.DonViXuLy.TenDonVi)
-    return db.scalars(s.where(M.DonViXuLy.DangSuDung == True) if chi_dang_dung else s).all()  # noqa
+    return db.scalars(s.where(M.DonViXuLy.DangSuDung == True) if chi_dang_dung else s).all()
 
 
 def ds_tham_so(db):
