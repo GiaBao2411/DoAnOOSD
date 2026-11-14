@@ -1,0 +1,29 @@
+{
+  // Các việc chạy nhanh trong VS Code: Terminal -> Run Task... (hoặc Ctrl+Shift+B để chạy hệ thống)
+  "version": "2.0.0",
+  "options": { "shell": { "executable": "cmd.exe", "args": ["/d", "/c"] } },
+  "tasks": [
+    {
+      "label": "1. Chạy hệ thống (web + Jaeger)",
+      "type": "shell",
+      "command": "chay_he_thong.bat",
+      "problemMatcher": [],
+      "isBackground": true,
+      "group": { "kind": "build", "isDefault": true }
+    },
+    { "label": "2. Tạo database bằng lệnh (không cần SSMS)", "type": "shell", "command": ".venv\\Scripts\\python.exe -m app.seed", "problemMatcher": [] },
+    { "label": "3. Giả lập thiết bị đo (Ctrl+C để dừng)", "type": "shell", "command": ".venv\\Scripts\\python.exe tools\\gia_lap_tram.py", "problemMatcher": [] },
+    { "label": "4. Chạy kiểm thử tự động (40 test case)", "type": "shell", "command": ".venv\\Scripts\\python.exe tests\\test_he_thong.py", "problemMatcher": [] },
+    { "label": "5. Tạo lại dữ liệu mẫu (XÓA dữ liệu cũ)", "type": "shell", "command": ".venv\\Scripts\\python.exe -m app.seed --reset", "problemMatcher": [] },
+    { "label": "6. Bật Jaeger (Docker)", "type": "shell", "command": "docker compose up -d", "problemMatcher": [] },
+    { "label": "7. Tắt Jaeger (Docker)", "type": "shell", "command": "docker compose down", "problemMatcher": [] },
+    {
+      "label": "8. Sửa giao diện React (npm run dev)",
+      "type": "shell",
+      "command": "npm install && npm run dev",
+      "options": { "cwd": "${workspaceFolder}/frontend" },
+      "problemMatcher": [],
+      "isBackground": true
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "author": "Huynh Gia Bao - 1250080014",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-pi-pico-2w",
+      "id": "pico",
+      "top": 0,
+      "left": 0,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_khi",
+      "top": -20,
+      "left": -190,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot_nuoc",
+      "top": 110,
+      "left": -190,
+      "attrs": {}
+    }
+  ],
+  "connections": [
+    [
+      "pot_khi:VCC",
+      "pico:3V3",
+      "red",
+      []
+    ],
+    [
+      "pot_khi:GND",
+      "pico:GND.8",
+      "black",
+      []
+    ],
+    [
+      "pot_khi:SIG",
+      "pico:GP26",
+      "orange",
+      []
+    ],
+    [
+      "pot_nuoc:VCC",
+      "pico:3V3",
+      "red",
+      []
+    ],
+    [
+      "pot_nuoc:GND",
+      "pico:GND.8",
+      "black",
+      []
+    ],
+    [
+      "pot_nuoc:SIG",
+      "pico:GP27",
+      "blue",
+      []
+    ]
+  ],
+  "dependencies": {}
+}

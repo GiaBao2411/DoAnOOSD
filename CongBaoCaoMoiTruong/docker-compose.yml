@@ -1,0 +1,18 @@
+# =====================================================================
+#  Docker chạy Jaeger — nơi nhận và hiển thị trace OpenTelemetry của hệ thống.
+#  chay_he_thong.bat tự bật container này (nếu Docker Desktop đang mở) rồi chạy web.
+#    Giao diện Jaeger: http://localhost:16686      Cổng nhận trace (OTLP/HTTP): 4318
+#  Web (FastAPI + React) chạy trực tiếp trên Windows và kết nối SQL Server trên máy bằng
+#  tài khoản Windows (DATABASE_URL trong .env) — không cần tài khoản sa hay tài khoản SQL nào.
+#  Tự bật/tắt bằng lệnh:  docker compose up -d   /   docker compose down
+# =====================================================================
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:1.62.0
+    container_name: cbcmt-jaeger
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    ports:
+      - "16686:16686"         # giao diện Jaeger
+      - "4318:4318"           # nhận trace OTLP qua HTTP
+    restart: unless-stopped

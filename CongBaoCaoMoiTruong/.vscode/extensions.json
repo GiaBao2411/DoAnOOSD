@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "ms-python.python",
+    "ms-python.debugpy",
+    "ms-mssql.mssql",
+    "ms-azuretools.vscode-docker",
+    "paulober.pico-w-go"
+  ]
+}
