@@ -7,6 +7,8 @@ import iconUrl from "leaflet/dist/images/marker-icon.png";
 import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
 import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
+// Vite tự đưa đường dẫn đúng của ảnh ghim; bỏ hàm tự ghép đường dẫn của Leaflet để ghim không bị vỡ hình
+delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
 
 function nen(map) {
